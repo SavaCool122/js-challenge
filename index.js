@@ -112,9 +112,8 @@ class Select {
       setLogMsg(`Set ${selectedEl} element`)
     })
     getBtn.addEventListener('click', () => {
-      console.log(data[selectedEl].label);
 
-      setLogMsg('get element')
+      setLogMsg(`get element ${data[selectedEl].label}`)
     })
     clearBtn.addEventListener('click', () => {
       selectedEl = null
