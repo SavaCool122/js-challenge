@@ -1,26 +1,33 @@
 class Select {
   constructor({ selector, label, url }) {
-    fetchData()
-    const globalParent = document.querySelector(selector)
+
+    var data = data || fetchData()
+    var selectedEl = null
+    const initSelect = document.querySelector(selector)
 
     const form = document.getElementById('form')
-    const formText = document.getElementById('formtext')
 
     const openBtn = document.querySelector('#open')
     const closeBtn = document.querySelector('#close')
     const setBtn = document.querySelector('#set')
     const getBtn = document.querySelector('#get')
+    const clearBtn = document.querySelector('#clear')
     const destroyBtn = document.querySelector('#destroy')
+
+    const logMsg = document.querySelector('#log')
 
     const svgArrow = document.querySelector('.container svg')
 
-    const listEl = document.createElement('ul')
-    const formLabel = createElement(globalParent, 'label', 'lableBottom')
-    formLabel.innerText = label
+    const formText = createElement(form, 'span')
+    const listEl = createElement(initSelect, 'ul', 'hidden-ul')
+    const formLabel = createElement(initSelect, 'label', 'lableBottom')
 
-    var data = data || fetchData()
+    initElements()
+    updateList()
 
-    var selectedEl = ''
+    function initElements() {
+      formLabel.innerText = label
+    }
 
     async function fetchData() {
       var response = await fetch('data/data.json')
@@ -28,47 +35,47 @@ class Select {
       return data
     }
 
-    function closeSelect() {
-      formLabel.classList.add('lableBottom')
-      formLabel.classList.remove('lableTop')
-      removeAllChild(formText)
-      listEl.removeEventListener('click', selectItem)
-    }
-
-    function openSelect() {
+    function showList() {
+      updateList()
+      listEl.classList.remove('hidden-ul')
       formLabel.classList.remove('lableBottom')
       formLabel.classList.add('lableTop')
-    }
-
-    function openList() {
       svgArrow.classList.add('rotate-arrow')
+      listEl.addEventListener('click', selectItem)
+
+      setLogMsg('show list')
     }
 
-    function closeList() {
+    function hideList() {
+      listEl.classList.add('hidden-ul')
+      removeAllChild(listEl)
+      if (!selectedEl) {
+        formLabel.classList.add('lableBottom')
+        formLabel.classList.remove('lableTop')
+      }
       svgArrow.classList.remove('rotate-arrow')
-      removeAllChild(formText)
+      listEl.removeEventListener('click', selectItem)
+
+      setLogMsg('hide list')
     }
 
     function selectItem(e) {
-      e.target.classList.add('list-item-active')
-      var indexOfElement = e.target.dataset.index;
-      setTextFromData(formText, indexOfElement)
-      selectedEl = ''
-      closeList()
-      closeSelect()
+      selectedEl = e.target.dataset.index
+      updateList()
+      hideList()
+
+      setLogMsg(`selceted ${data[selectedEl].label}`)
     }
 
-    function setTextFromData(elem, index) {
-      elem.innerText = data[index].label
-      selectedEl = data[index]
-    }
-
-    function updateList(items) {
-      for (let i = 0; i < items.length; i++) {
-        const el = items[i]
+    function updateList() {
+      console.log('Update');
+      formText.innerText = (selectedEl) ? data[selectedEl].label : ''
+      listEl.innerHTML = ''
+      for (let i = 0; i < data.length; i++) {
+        const el = data[i]
         let item = document.createElement('li')
         item.innerHTML = `
-        <li class="${(selectedEl.label == el.label) ? 'list-item-active' : ''}" tabindex = "0" data-index="${i}" > 
+        <li class="${(selectedEl == i) ? 'list-item-active' : ''}" tabindex = "0" data-index="${i}" > 
           ${el.label} 
         </li>
         `
@@ -76,9 +83,8 @@ class Select {
       }
     }
 
-    function renderList() {
-      formText.appendChild(listEl)
-      listEl.addEventListener('click', selectItem)
+    function setLogMsg(msg) {
+      logMsg.innerText = msg
     }
 
     function createElement(parent, elem, clazz) {
@@ -94,39 +100,34 @@ class Select {
       }
     }
 
+    form.addEventListener('click', showList)
 
-    form.addEventListener('click', () => {
-      updateList(data)
-      openSelect()
-      openList()
-      renderList()
-    })
-    openBtn.addEventListener('click', () => {
-      updateList(data)
-      openSelect()
-      openList()
-      renderList()
-    })
-    closeBtn.addEventListener('click', () => {
-      selectedEl = ''
-      closeSelect()
-      closeList()
-    })
+    openBtn.addEventListener('click', showList)
+    closeBtn.addEventListener('click', hideList)
     setBtn.addEventListener('click', () => {
-      setTextFromData(formText, 5)
-      openSelect()
+      selectedEl = 5
+      updateList()
+      showList()
+      hideList()
+
+      setLogMsg(`Set ${selectedEl} element`)
     })
     getBtn.addEventListener('click', () => {
-      console.log(selectedEl);
+      console.log(data[selectedEl].label);
+
+      setLogMsg('get element')
+    })
+    clearBtn.addEventListener('click', () => {
+      selectedEl = null
+      updateList()
+      hideList()
+
+      setLogMsg('cleared element')
     })
     destroyBtn.addEventListener('click', () => {
-      removeAllChild(globalParent)
+      removeAllChild(initSelect)
+
+      setLogMsg('destroyed select')
     })
   }
 }
-
-// const el = items[i];
-// listEl.
-// // node = 
-
-
