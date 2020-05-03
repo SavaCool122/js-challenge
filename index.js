@@ -68,7 +68,6 @@ class Select {
     }
 
     function updateList() {
-      console.log('Update');
       formText.innerText = (selectedEl) ? data[selectedEl].label : ''
       listEl.innerHTML = ''
       for (let i = 0; i < data.length; i++) {
