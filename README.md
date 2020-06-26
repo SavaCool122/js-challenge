@@ -1,4 +1,4 @@
-# js-challenge
+# JavaScript Challange - Custom Select With Animations
 
 This repository contains a solution to the challenge that I found on the Internet
 
